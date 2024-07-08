@@ -17,8 +17,8 @@ int ec_verify(EC_KEY const *key, uint8_t const *msg, size_t msglen,
 	if (!key || !msg || !sig)
 		return (0);
 
-	if (!EC_KEY_check_key(key))
+	if (ECDSA_verify(0, msg, msglen, sig->sig, sig->len, (EC_KEY *) key) != 1)
 		return (0);
 
-	return (ECDSA_verify(0, msg, msglen, sig->sig, sig->len, (EC_KEY *) key));
+	return (1);
 }

@@ -16,8 +16,6 @@
  */
 int ec_save(EC_KEY *key, char const *folder)
 {
-	const char *private_key_filename = "key.pem";
-	const char *public_key_filename = "key_pub.pem";
 	FILE *file_ptr;
 
 	if (!key || !folder)
@@ -34,7 +32,7 @@ int ec_save(EC_KEY *key, char const *folder)
 		return (0);
 
 	/* Write the private key to private PEM file */
-	file_ptr = fopen(private_key_filename, "w");
+	file_ptr = fopen(PRI_FILENAME, "w");
 	if (!file_ptr)
 		return (0);
 	if (PEM_write_ECPrivateKey(file_ptr, key, NULL, NULL, 0, 0, 0) == 0)
@@ -42,7 +40,7 @@ int ec_save(EC_KEY *key, char const *folder)
 	fclose(file_ptr);
 
 	/* Write the public key to public PEM file */
-	file_ptr = fopen(public_key_filename, "w");
+	file_ptr = fopen(PUB_FILENAME, "w");
 	if (!file_ptr)
 		return (0);
 	if (PEM_write_EC_PUBKEY(file_ptr, key) == 0)

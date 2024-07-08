@@ -14,17 +14,12 @@
 uint8_t
 *ec_sign(EC_KEY const *key, uint8_t const *msg, size_t msglen, sig_t *sig)
 {
-	uint8_t digest[SHA256_DIGEST_LENGTH];
-
-	if (!key || !msg || (msglen == 0) || (msglen > SHA256_DIGEST_LENGTH))
+	if (!key || !msg || !sig)
 		return (NULL);
 
-	/* Hash the message */
-	SHA256((unsigned char *)msg, msglen, digest);
-
 	/* Sign the message */
-	if (ECDSA_sign(0, digest, SHA256_DIGEST_LENGTH,
-				   sig->sig, (unsigned int *) &(sig->len), (EC_KEY *) key) == 0)
+	if (ECDSA_sign(0, msg, msglen, sig->sig, (unsigned int *) &(sig->len),
+				   (EC_KEY *) key) == 0)
 	{
 		return (NULL);
 	}

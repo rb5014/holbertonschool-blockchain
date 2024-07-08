@@ -12,32 +12,24 @@
 */
 EC_KEY *ec_load(char const *folder)
 {
-	EC_KEY *key;
+	EC_KEY *key = NULL;
 	FILE *file_ptr;
 
 	/* Check if folder NULL, and change dir to folder if it exists */
 	if (!folder || (chdir(folder) != 0))
 		return (NULL);
 
-	/* Create new EC_KEY to store public and private keys*/
-	key = EC_KEY_new_by_curve_name(EC_CURVE);
-	if (!key)
-		return (NULL);
-
 	/* Load private key*/
 	file_ptr = fopen(PRI_FILENAME, "r");
 	if (!file_ptr || !PEM_read_ECPrivateKey(file_ptr, &key, NULL, NULL))
-	{
-		EC_KEY_free(key);
 		return (NULL);
-	}
 	fclose(file_ptr);
 
 	/* Load public key*/
 	file_ptr = fopen(PUB_FILENAME, "r");
 	if (!file_ptr || !PEM_read_EC_PUBKEY(file_ptr, &key, NULL, NULL))
 	{
-		EC_KEY_free(key);
+		EC_KEY_free(key); /* free because allocated for private already */
 		return (NULL);
 	}
 	fclose(file_ptr);

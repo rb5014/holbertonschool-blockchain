@@ -1,9 +1,9 @@
 #include "hblk_crypto.h"
 
 /**
- * init_buffer - initialize buffer elements to null char
- * @buf: buffer to init
- * @len: len of buffer
+ * init_buffer - initialize buffer elements to null char.
+ * @buf: buffer to init.
+ * @len: len of buffer.
 */
 void init_buffer(char *buf, int len)
 {

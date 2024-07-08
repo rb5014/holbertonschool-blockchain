@@ -5,6 +5,7 @@
 #include <openssl/ec.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
+#include <openssl/ecdsa.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdint.h>
@@ -57,5 +58,8 @@ int ec_save(EC_KEY *key, char const *folder);
 /* ec_load.c */
 EC_KEY *ec_load(char const *folder);
 
+/* ec_sign.c */
+uint8_t
+*ec_sign(EC_KEY const *key, uint8_t const *msg, size_t msglen, sig_t *sig);
 
 #endif /* HBLK_CRYPTO_H */

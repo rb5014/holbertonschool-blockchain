@@ -19,17 +19,17 @@ EC_KEY *ec_load(char const *folder)
 	if (!folder || (chdir(folder) != 0))
 		return (NULL);
 
-	/* Load private key*/
-	file_ptr = fopen(PRI_FILENAME, "r");
-	if (!file_ptr || !PEM_read_ECPrivateKey(file_ptr, &key, NULL, NULL))
-		return (NULL);
-	fclose(file_ptr);
-
 	/* Load public key*/
 	file_ptr = fopen(PUB_FILENAME, "r");
 	if (!file_ptr || !PEM_read_EC_PUBKEY(file_ptr, &key, NULL, NULL))
+		return (NULL);
+	fclose(file_ptr);
+
+	/* Load private key*/
+	file_ptr = fopen(PRI_FILENAME, "r");
+	if (!file_ptr || !PEM_read_ECPrivateKey(file_ptr, &key, NULL, NULL))
 	{
-		EC_KEY_free(key); /* free because allocated for private already */
+		EC_KEY_free(key); /* free because allocated for public already */
 		return (NULL);
 	}
 	fclose(file_ptr);

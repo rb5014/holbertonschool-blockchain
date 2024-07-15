@@ -35,7 +35,11 @@ blockchain_t *blockchain_create(void)
 	}
 	*new_block = _genesis; /* Copy genesis blueprint structure into new_block */
 
-	llist_add_node(new_bchain->chain, new_block, ADD_NODE_FRONT);
+	if (llist_add_node(new_bchain->chain, new_block, ADD_NODE_FRONT) == -1)
+	{
+		free(new_bchain->chain), free(new_bchain), free(new_block);
+		return (NULL);
+	}
 
 	return (new_bchain);
 }

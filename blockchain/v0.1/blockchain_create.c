@@ -40,8 +40,8 @@ blockchain_t *blockchain_create(void)
 		free(new_bchain->chain), free(new_bchain);
 		return (NULL);
 	}
-
-	*new_block = _genesis; /* copy genesis blueprint structure into new_block */
+	/* Copy genesis blueprint structure into new_block */
+	memcpy(new_block, &_genesis, sizeof(block_t));
 	llist_add_node(new_bchain->chain, new_block, ADD_NODE_FRONT);
 
 	return (new_bchain);

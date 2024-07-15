@@ -56,7 +56,7 @@ blockchain_t *blockchain_create(void)
 	}
 
 	*new_block = _genesis;
-	new_blockchain->chain = llist_create(MT_SUPPORT_FALSE);
+	new_blockchain->chain = llist_create(MT_SUPPORT_TRUE);
 	if (!new_blockchain->chain)
 	{
 		fprintf(stderr, "List creation failed\n");

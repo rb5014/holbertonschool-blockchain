@@ -38,37 +38,29 @@ block_t const _genesis = {
  */
 blockchain_t *blockchain_create(void)
 {
-	blockchain_t *new_blockchain;
-	block_t *new_block;
+	blockchain_t *new_bchain = NULL;
+	block_t *new_block = NULL;
 
-	new_blockchain = malloc(sizeof(blockchain_t));
-	if (!new_blockchain)
+	new_bchain = malloc(sizeof(blockchain_t));
+	if (!new_bchain)
+		return (NULL);
+
+	new_bchain->chain = llist_create(MT_SUPPORT_TRUE);
+	if (!new_bchain->chain)
 	{
-		fprintf(stderr, "Malloc error on blockchain\n");
+		free(new_bchain);
 		return (NULL);
 	}
+
 	new_block = malloc(sizeof(block_t));
 	if (!new_block)
 	{
-		fprintf(stderr, "Malloc error on block\n");
-		free(new_blockchain);
+		free(new_bchain->chain), free(new_bchain);
 		return (NULL);
 	}
 
-	*new_block = _genesis;
-	new_blockchain->chain = llist_create(MT_SUPPORT_TRUE);
-	if (!new_blockchain->chain)
-	{
-		fprintf(stderr, "List creation failed\n");
-		free(new_block), free(new_blockchain);
-		return (NULL);
-	}
-	if (llist_add_node(new_blockchain->chain, new_block, ADD_NODE_FRONT) == -1)
-	{
-		fprintf(stderr, "Could not add node\n");
-		free(new_block), free(new_blockchain->chain), free(new_blockchain);
-		return (NULL);
-	}
+	*new_block = _genesis; /* copy genesis blueprint structure into new_block */
+	llist_add_node(new_bchain->chain, new_block, ADD_NODE_FRONT);
 
-	return (new_blockchain);
+	return (new_bchain);
 }

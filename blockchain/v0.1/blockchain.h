@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <openssl/sha.h>
 #include <time.h>
+#include "../../crypto/hblk_crypto.h"
 
 /**
  * struct blockchain_s - Blockchain structure
@@ -82,5 +83,8 @@ block_t
 void block_destroy(block_t *block);
 
 void blockchain_destroy(blockchain_t *blockchain);
+
+uint8_t
+*block_hash(block_t const *block, uint8_t hash_buf[SHA256_DIGEST_LENGTH]);
 
 #endif /* BLOCKCHAIN_H */

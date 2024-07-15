@@ -66,8 +66,7 @@ blockchain_t *blockchain_create(void)
 	if (llist_add_node(new_blockchain->chain, new_block, ADD_NODE_FRONT) == -1)
 	{
 		fprintf(stderr, "Could not add node\n");
-		llist_destroy(new_blockchain->chain, 0, NULL);
-		free(new_block), free(new_blockchain);
+		free(new_block), free(new_blockchain->chain), free(new_blockchain);
 		return (NULL);
 	}
 

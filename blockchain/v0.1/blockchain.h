@@ -9,6 +9,15 @@
 #include <time.h>
 #include "../../crypto/hblk_crypto.h"
 #include "./provided/endianness.h"
+
+#define HBLK_MAGIC "HBLK"
+#define LEN_MAGIC 4
+
+#define HBLK_VERSION "0.1"
+#define LEN_VERSION 3
+
+#define HBLK_ENDIAN _get_endianness()
+
 /**
  * struct blockchain_s - Blockchain structure
  *
@@ -88,5 +97,7 @@ uint8_t
 *block_hash(block_t const *block, uint8_t hash_buf[SHA256_DIGEST_LENGTH]);
 
 int blockchain_serialize(blockchain_t const *blockchain, char const *path);
+
+blockchain_t *blockchain_deserialize(char const *path);
 
 #endif /* BLOCKCHAIN_H */

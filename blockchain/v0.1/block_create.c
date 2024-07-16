@@ -36,6 +36,7 @@ block_t
 			   sizeof(new_block->info.prev_hash));
 	}
 	new_block->info.timestamp = time(NULL);
+	/* new_block->info.timestamp = 1537207477; */ /* hard code for tests */
 
 	/* Block data initialisation */
 	if (data && data_len)

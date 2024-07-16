@@ -9,31 +9,26 @@
  */
 int block_serialize(block_t *block, uint8_t hblk_endian, FILE *file)
 {
-	block_t tmp;
+	block_info_t info;
+	block_data_t data;
 
 	if (!block || !file)
 		return (-1);
 
-	tmp = *block;
+	info = block->info;
+	data = block->data;
 
 	/* Convert endianess if system is big endian */
 	if (hblk_endian == 0)
 	{
-		SWAPENDIAN(tmp.info.index);
-		SWAPENDIAN(tmp.info.difficulty);
-		SWAPENDIAN(tmp.info.timestamp);
-		SWAPENDIAN(tmp.info.nonce);
-		SWAPENDIAN(tmp.data.len);
+		SWAPENDIAN(info);
+		SWAPENDIAN(data.len);
 	}
 	/* Write block */
-	fwrite(&(tmp.info.index), sizeof(tmp.info.index), 1, file);
-	fwrite(&(tmp.info.difficulty), sizeof(tmp.info.difficulty), 1, file);
-	fwrite(&(tmp.info.timestamp), sizeof(tmp.info.timestamp), 1, file);
-	fwrite(&(tmp.info.nonce), sizeof(tmp.info.nonce), 1, file);
-	fwrite(&tmp.info.prev_hash, SHA256_DIGEST_LENGTH, 1, file);
-	fwrite(&tmp.data.len, sizeof(tmp.data.len), 1, file);
-	fwrite(&tmp.data.buffer, tmp.data.len, 1, file);
-	fwrite(&tmp.hash, SHA256_DIGEST_LENGTH, 1, file);
+	fwrite(&info, sizeof(info), 1, file);
+	fwrite(&(data.len), sizeof(data.len), 1, file);
+	fwrite(&(data.buffer), data.len, 1, file);
+	fwrite(&(block->hash), SHA256_DIGEST_LENGTH, 1, file);
 
 	return (0);
 }

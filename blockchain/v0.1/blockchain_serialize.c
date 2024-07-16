@@ -1,6 +1,31 @@
 #include "blockchain.h"
 
 /**
+ * header_serialize - Serializes blockchain header into a file
+ * @num_blocks: number of blocks in the blockchain
+ * @hblk_endian: endianness of the system
+ * @file: file to write
+ * Return: 0 upon success, or -1 upon failure
+*/
+int header_serialize(uint32_t num_blocks, uint8_t hblk_endian, FILE *file)
+{
+	const char hblk_magic[] = "HBLK";
+	const char hblk_version[] = "0.1";
+
+	if (!file)
+		return (-1);
+
+	if (hblk_endian == 0) /* If system is big-endian, swap to little-endian */
+		SWAPENDIAN(num_blocks);
+
+	fwrite(hblk_magic, sizeof(hblk_magic) - 1, 1, file);
+	fwrite(hblk_version, sizeof(hblk_version) - 1, 1, file);
+	fwrite(&hblk_endian, sizeof(hblk_endian), 1, file);
+	fwrite(&num_blocks, sizeof(num_blocks), 1, file);
+
+	return (0);
+}
+/**
  * block_serialize - Serializes a Block into a file
  * @block: Pointer to the Block to be serialized,
  * @hblk_endian: endianness of the system
@@ -45,10 +70,8 @@ int blockchain_serialize(blockchain_t const *blockchain, char const *path)
 {
 	size_t i;
 	FILE *file;
-	const char hblk_magic[] = "HBLK";
-	const char hblk_version[] = "0.1";
-	uint8_t hblk_endian = _get_endianness();
 	uint32_t num_blocks;
+	const uint8_t hblk_endian = _get_endianness();
 
 	if (!blockchain || !path)
 		return (-1);
@@ -57,16 +80,14 @@ int blockchain_serialize(blockchain_t const *blockchain, char const *path)
 	if (!file)
 		return (-1);
 
-	/* Write the header */
-	fwrite(hblk_magic, strlen(hblk_magic), 1, file);
-	fwrite(hblk_version, strlen(hblk_version), 1, file);
-	fwrite(&hblk_endian, sizeof(hblk_endian), 1, file);
-
-	/* Write the number of blocks */
 	num_blocks = llist_size(blockchain->chain);
-	if (hblk_endian == 0) /* If system is big-endian, swap to little-endian */
-		SWAPENDIAN(num_blocks);
-	fwrite(&num_blocks, sizeof(num_blocks), 1, file);
+
+	/* Write the header */
+	if (header_serialize(num_blocks, hblk_endian, file) == -1)
+	{
+		fclose(file);
+		return (-1);
+	}
 
 	/* Write each block */
 	for (i = 0; i < num_blocks; i++)
@@ -74,7 +95,10 @@ int blockchain_serialize(blockchain_t const *blockchain, char const *path)
 		block_t *block = llist_get_node_at(blockchain->chain, i);
 
 		if (block_serialize(block, hblk_endian, file) == -1)
+		{
+			fclose(file);
 			return (-1);
+		}
 	}
 	fclose(file);
 

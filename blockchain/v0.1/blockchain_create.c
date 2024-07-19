@@ -20,7 +20,7 @@ blockchain_t *blockchain_create(void)
 	if (!new_bchain)
 		return (NULL);
 
-	new_bchain->chain = llist_create(MT_SUPPORT_TRUE);
+	new_bchain->chain = llist_create(MT_SUPPORT_FALSE);
 	if (!new_bchain->chain)
 	{
 		free(new_bchain);

@@ -40,6 +40,8 @@ block_t *block_deserialize(FILE *file, const uint8_t file_endian)
 	if (!block)
 		return (NULL);
 
+	memset(block, 0, sizeof(block_t));
+
 	fread(&(block->info), sizeof(block_info_t), 1, file);
 	fread(&(block->data.len), sizeof(block->data.len), 1, file);
 	if (file_endian != HBLK_ENDIAN)
@@ -73,15 +75,15 @@ blockchain_t *blockchain_deserialize(char const *path)
 	if (!file || !blockchain)
 	{
 		fclose(file);
-		free(blockchain);
+		blockchain_destroy(blockchain);
 		return (NULL);
 	}
 
-	blockchain->chain = llist_create(MT_SUPPORT_TRUE);
+	blockchain->chain = llist_create(MT_SUPPORT_FALSE);
 	if (!blockchain->chain || header_deserialize(file, &file_endian) == -1)
 	{
 		fclose(file);
-		free(blockchain->chain), free(blockchain);
+		blockchain_destroy(blockchain);
 		return (NULL);
 	}
 
@@ -96,13 +98,13 @@ blockchain_t *blockchain_deserialize(char const *path)
 		if (!block)
 		{
 			fclose(file);
-			llist_destroy(blockchain->chain, 1, free);
-			free(blockchain);
+			blockchain_destroy(blockchain);
 			return (NULL);
 		}
 
 		llist_add_node(blockchain->chain, block, ADD_NODE_REAR);
 	}
 
+	fclose(file);
 	return (blockchain);
 }

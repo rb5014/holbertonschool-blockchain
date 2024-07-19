@@ -17,8 +17,11 @@ uint8_t
 {
 	size_t len;
 
+
 	if (!block || (hash_buf == NULL))
 		return (NULL);
+
+	memset(hash_buf, 0, SHA256_DIGEST_LENGTH);
 
 	len = sizeof(block_info_t) + block->data.len;
 

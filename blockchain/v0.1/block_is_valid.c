@@ -38,19 +38,16 @@ int block_is_valid(block_t const *block, block_t const *prev_block)
 			return (-1);
 
 		block_hash(prev_block, hash_buf);
-		if (strncmp((char *) prev_block->hash,
-					(char *) hash_buf, SHA256_DIGEST_LENGTH) != 0)
+		if (memcmp(prev_block->hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
 			return (-1);
 
 		block_hash(prev_block, hash_buf);
-		if (strncmp((char *) block->info.prev_hash,
-					(char *) hash_buf, SHA256_DIGEST_LENGTH) != 0)
+		if (memcmp(block->info.prev_hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
 			return (-1);
 	}
 
 	block_hash(block, hash_buf);
-	if (strncmp((char *) block->hash,
-				(char *) hash_buf, SHA256_DIGEST_LENGTH) != 0)
+	if (memcmp(block->hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
 		return (-1);
 
 	if (block->data.len > BLOCKCHAIN_DATA_MAX)

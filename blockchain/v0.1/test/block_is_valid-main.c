@@ -20,6 +20,7 @@ int main(void)
 	block_hash(block, block->hash);
 	llist_add_node(blockchain->chain, block, ADD_NODE_REAR);
 
+
 	if (block_is_valid(first, NULL) != 0 ||
 		block_is_valid(block, first) != 0)
 	{

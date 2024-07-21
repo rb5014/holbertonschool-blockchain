@@ -26,12 +26,8 @@ int block_is_valid(block_t const *block, block_t const *prev_block)
 {
 	uint8_t hash_buf[SHA256_DIGEST_LENGTH];
 
-	/* 1 */
-	if (!block)
-		return (-1);
-
-	/* 2 */
-	if (!prev_block && (block->info.index != 0))
+	/* 1 && 2 */
+	if (!block || (!prev_block && (block->info.index != 0)))
 		return (-1);
 
 	/* 3 */

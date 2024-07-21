@@ -35,7 +35,7 @@ int block_is_valid(block_t const *block, block_t const *prev_block)
 		return (-1);
 
 	/* 3 */
-	if (!block->info.index && (memcmp(block, &_genesis, sizeof(block_t))))
+	if ((block->info.index == 0) && (memcmp(block, &_genesis, sizeof(block_t))))
 		return (-1);
 
 	if (prev_block)

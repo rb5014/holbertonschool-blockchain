@@ -29,37 +29,30 @@ int block_is_valid(block_t const *block, block_t const *prev_block)
 	/* 1 && 2 */
 	if (!block || (!prev_block && (block->info.index != 0)))
 		return (-1);
-
 	/* 3 */
 	if ((block->info.index == 0) && (memcmp(block, &_genesis, sizeof(block_t))))
 		return (-1);
-
+	/* 9 */
 	if (hash_matches_difficulty(block->hash, block->info.nonce) == 0)
 		return (-1);
-
 	if (prev_block)
 	{
 		/* 4 */
 		if (block->info.index != (prev_block->info.index + 1))
 			return (-1);
-
 		/* 5 */
 		block_hash(prev_block, hash_buf);
 		if (memcmp(prev_block->hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
 			return (-1);
-
 		/* 6 */
 		block_hash(prev_block, hash_buf);
 		if (memcmp(block->info.prev_hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
 			return (-1);
-
 	}
-
 	/* 7 */
 	block_hash(block, hash_buf);
 	if (memcmp(block->hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
 		return (-1);
-
 	/* 8 */
 	if (block->data.len > BLOCKCHAIN_DATA_MAX)
 		return (-1);

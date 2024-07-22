@@ -14,8 +14,9 @@ int hash_matches_difficulty(uint8_t const hash[SHA256_DIGEST_LENGTH],
 	uint32_t i;
 	uint32_t full_bytes;
 	uint32_t remaining_bits;
+	const uint32_t max_number_of_bits = SHA256_DIGEST_LENGTH * 8;
 
-	if (hash == NULL)
+	if ((hash == NULL) || (difficulty > max_number_of_bits))
 		return (0);
 
 	full_bytes = difficulty / 8;

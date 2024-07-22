@@ -33,7 +33,7 @@ int block_is_valid(block_t const *block, block_t const *prev_block)
 	if ((block->info.index == 0) && (memcmp(block, &_genesis, sizeof(block_t))))
 		return (-1);
 	/* 9 */
-	if (hash_matches_difficulty(block->hash, block->info.nonce) == 0)
+	if (hash_matches_difficulty(block->hash, block->info.difficulty) == 0)
 		return (-1);
 	if (prev_block)
 	{

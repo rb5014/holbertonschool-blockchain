@@ -20,6 +20,7 @@
  *	You don’t have to worry about the timestamp and the difficulty for this
  *          iteration of the Blockchain.
  *	8. The Block data length must not exceed BLOCKCHAIN_DATA_MAX
+ *	9. The Block hash matches its difficulty
 */
 int block_is_valid(block_t const *block, block_t const *prev_block)
 {
@@ -31,6 +32,9 @@ int block_is_valid(block_t const *block, block_t const *prev_block)
 
 	/* 3 */
 	if ((block->info.index == 0) && (memcmp(block, &_genesis, sizeof(block_t))))
+		return (-1);
+
+	if (hash_matches_difficulty(block->hash, block->info.nonce) == 0)
 		return (-1);
 
 	if (prev_block)
@@ -48,6 +52,7 @@ int block_is_valid(block_t const *block, block_t const *prev_block)
 		block_hash(prev_block, hash_buf);
 		if (memcmp(block->info.prev_hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
 			return (-1);
+
 	}
 
 	/* 7 */

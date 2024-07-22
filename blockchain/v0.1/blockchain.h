@@ -84,7 +84,8 @@ typedef struct block_s
 	uint8_t hash[SHA256_DIGEST_LENGTH];
 } block_t;
 
-extern block_t const _genesis; /* used in other files */
+/* Used in other files, comes from provided/_genesis.c */
+extern block_t const _genesis;
 
 blockchain_t *blockchain_create(void);
 

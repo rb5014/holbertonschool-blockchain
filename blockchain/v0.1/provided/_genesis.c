@@ -1,6 +1,6 @@
 #include "blockchain.h"
 
-static block_t const _genesis = {
+block_t const _genesis = {
 	{ /* info */
 		0 /* index */,
 		0, /* difficulty */

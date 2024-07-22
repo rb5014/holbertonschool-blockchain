@@ -1,5 +1,4 @@
 #include "blockchain.h"
-#include "provided/_genesis.c"
 
 /**
  * block_is_valid - Verifies that a Block is valid

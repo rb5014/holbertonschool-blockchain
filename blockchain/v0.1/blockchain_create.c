@@ -1,5 +1,4 @@
 #include "blockchain.h"
-#include "provided/_genesis.c"
 
 
 /**

@@ -20,9 +20,9 @@
 #define HBLK_ENDIAN _get_endianness()
 
 /* Defines how often (in seconds) a Block should be found */
-#define BLOCK_GENERATION_INTERVAL 1000
+#define BLOCK_GENERATION_INTERVAL 1
 /* Defines how often (in Blocks) the difficulty should be adjusted */
-#define DIFFICULTY_ADJUSTMENT_INTERVAL 2
+#define DIFFICULTY_ADJUSTMENT_INTERVAL 5
 
 /**
  * struct blockchain_s - Blockchain structure

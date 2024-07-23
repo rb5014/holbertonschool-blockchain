@@ -35,17 +35,22 @@ uint32_t blockchain_difficulty(blockchain_t const *blockchain)
 	last_index = size - 1;
 	tail = llist_get_tail(blockchain->chain);
 
-	if (!tail)
+	if (size <= 1 || !tail)
 		return (0);
 
     /* if last_index not a multiple of diff interval OR is the genesis block */
-	if ((last_index % DIFFICULTY_ADJUSTMENT_INTERVAL != 0) || size == 1)
+	if ((last_index % DIFFICULTY_ADJUSTMENT_INTERVAL != 0) ||
+		 (memcmp(tail, &_genesis, sizeof(block_t)) == 0))
+	{
 		return (tail->info.difficulty);
+	}
 
 	/* Now difficulty must be adjusted */
 	last_adjust_index = size - DIFFICULTY_ADJUSTMENT_INTERVAL;
 	last_adjust_block = (block_t *) llist_get_node_at(blockchain->chain,
 													  last_adjust_index);
+	if (!last_adjust_block)
+		return (tail->info.difficulty);
 
 	expected_time = DIFFICULTY_ADJUSTMENT_INTERVAL * BLOCK_GENERATION_INTERVAL;
 	actual_time = tail->info.timestamp - last_adjust_block->info.timestamp;

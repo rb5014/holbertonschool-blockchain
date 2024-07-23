@@ -9,6 +9,7 @@
 #include <time.h>
 #include "../../crypto/hblk_crypto.h"
 #include "./provided/endianness.h"
+#include <time.h>
 
 #define HBLK_MAGIC "HBLK"
 #define LEN_MAGIC 4
@@ -17,6 +18,11 @@
 #define LEN_VERSION 3
 
 #define HBLK_ENDIAN _get_endianness()
+
+/* Defines how often (in seconds) a Block should be found */
+#define BLOCK_GENERATION_INTERVAL 1000
+/* Defines how often (in Blocks) the difficulty should be adjusted */
+#define DIFFICULTY_ADJUSTMENT_INTERVAL 2
 
 /**
  * struct blockchain_s - Blockchain structure
@@ -109,5 +115,7 @@ int hash_matches_difficulty(uint8_t const hash[SHA256_DIGEST_LENGTH],
 							uint32_t difficulty);
 
 void block_mine(block_t *block);
+
+uint32_t blockchain_difficulty(blockchain_t const *blockchain);
 
 #endif /* BLOCKCHAIN_H */

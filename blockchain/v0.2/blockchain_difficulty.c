@@ -27,38 +27,38 @@ uint32_t blockchain_difficulty(blockchain_t const *blockchain)
 	block_t *tail, *last_adjust_block;
 	uint32_t size, last_index, last_adjust_index;
 	uint32_t actual_time = 0, expected_time;
+	uint32_t difficulty;
 
 	if (!blockchain)
 		return (0);
 
-	size = llist_size(blockchain->chain);
-	last_index = size - 1;
 	tail = llist_get_tail(blockchain->chain);
-
-	if (size <= 1 || !tail)
+	if (!tail)
 		return (0);
 
+	/* Set difficulty of new block to last difficulty */
+	difficulty = tail->info.difficulty;
+	last_index = tail->info.index;
+
     /* if last_index not a multiple of diff interval OR is the genesis block */
-	if ((last_index % DIFFICULTY_ADJUSTMENT_INTERVAL != 0) ||
-		 (memcmp(tail, &_genesis, sizeof(block_t)) == 0))
-	{
-		return (tail->info.difficulty);
-	}
+	if ((last_index == 0) || last_index % DIFFICULTY_ADJUSTMENT_INTERVAL != 0)
+		return (difficulty);
 
 	/* Now difficulty must be adjusted */
+	size = llist_size(blockchain->chain);
 	last_adjust_index = size - DIFFICULTY_ADJUSTMENT_INTERVAL;
 	last_adjust_block = (block_t *) llist_get_node_at(blockchain->chain,
 													  last_adjust_index);
 	if (!last_adjust_block)
-		return (tail->info.difficulty);
+		return (difficulty);
 
 	expected_time = DIFFICULTY_ADJUSTMENT_INTERVAL * BLOCK_GENERATION_INTERVAL;
 	actual_time = tail->info.timestamp - last_adjust_block->info.timestamp;
 
 	if (actual_time < (expected_time / 2))
-		tail->info.difficulty++;
-	else if ((actual_time > 2 * expected_time) && tail->info.difficulty > 0)
-		tail->info.difficulty--;
+		difficulty++;
+	else if ((actual_time > 2 * expected_time) && difficulty > 0)
+		difficulty--;
 
-	return (tail->info.difficulty);
+	return (difficulty);
 }

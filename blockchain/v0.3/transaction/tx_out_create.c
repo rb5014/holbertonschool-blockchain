@@ -28,7 +28,11 @@ tx_out_t *tx_out_create(uint32_t amount, uint8_t const pub[EC_PUB_LEN])
 
 	len = sizeof(*new_tx_out) - sizeof(new_tx_out->hash);
 
-	sha256((int8_t const *)new_tx_out, len, new_tx_out->hash);
+	if (!sha256((int8_t const *)new_tx_out, len, new_tx_out->hash))
+	{
+		free(new_tx_out);
+		return (NULL);
+	}
 
 	return (new_tx_out);
 }

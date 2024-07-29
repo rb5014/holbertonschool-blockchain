@@ -14,7 +14,7 @@
 #define HBLK_MAGIC "HBLK"
 #define LEN_MAGIC 4
 
-#define HBLK_VERSION "0.2"
+#define HBLK_VERSION "0.3"
 #define LEN_VERSION 3
 
 #define HBLK_ENDIAN _get_endianness()
@@ -24,14 +24,18 @@
 /* Defines how often (in Blocks) the difficulty should be adjusted */
 #define DIFFICULTY_ADJUSTMENT_INTERVAL 5
 
+#define COINBASE_AMOUNT    50
+
 /**
  * struct blockchain_s - Blockchain structure
  *
- * @chain: Linked list of pointers to block_t
+ * @chain:   Linked list of Blocks
+ * @unspent: Linked list of unspent transaction outputs
  */
 typedef struct blockchain_s
 {
 	llist_t *chain;
+	llist_t *unspent;
 } blockchain_t;
 
 /**
@@ -79,14 +83,16 @@ typedef struct block_data_s
 /**
  * struct block_s - Block structure
  *
- * @info: Block info
- * @data: Block data
- * @hash: 256-bit digest of the Block, to ensure authenticity
+ * @info:         Block info
+ * @data:         Block data
+ * @transactions: List of transactions
+ * @hash:         256-bit digest of the Block, to ensure authenticity
  */
 typedef struct block_s
 {
 	block_info_t info; /* This must stay first */
 	block_data_t data; /* This must stay second */
+	llist_t *transactions;
 	uint8_t hash[SHA256_DIGEST_LENGTH];
 } block_t;
 
@@ -95,15 +101,13 @@ extern block_t const _genesis;
 
 blockchain_t *blockchain_create(void);
 
-block_t
-*block_create(block_t const *prev, int8_t const *data, uint32_t data_len);
+block_t *block_create(block_t const *prev, int8_t const *data, uint32_t data_len);
 
 void block_destroy(block_t *block);
 
 void blockchain_destroy(blockchain_t *blockchain);
 
-uint8_t
-*block_hash(block_t const *block, uint8_t hash_buf[SHA256_DIGEST_LENGTH]);
+uint8_t *block_hash(block_t const *block, uint8_t hash_buf[SHA256_DIGEST_LENGTH]);
 
 int blockchain_serialize(blockchain_t const *blockchain, char const *path);
 

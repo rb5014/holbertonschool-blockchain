@@ -1,6 +1,8 @@
 #ifndef TRANSACTION_H
 #define TRANSACTION_H
-#include "blockchain.h"
+
+#include "../../../crypto/hblk_crypto.h"
+#include <llist.h>
 /**
  * struct transaction_s - Transaction structure
  *

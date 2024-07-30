@@ -36,6 +36,25 @@ typedef struct tx_out_s
 } tx_out_t;
 
 /**
+ * struct unspent_tx_out_s - Unspent transaction output
+ *
+ * Description: This structure helps identify transaction outputs that were not
+ * used in any transaction input yet, making them "available".
+ *
+ * @block_hash: Hash of the Block containing the transaction @tx_id
+ * @tx_id:      ID of the transaction containing @out
+ * @out:        Copy of the referenced transaction output
+ */
+typedef struct unspent_tx_out_s
+{
+	uint8_t block_hash[SHA256_DIGEST_LENGTH];
+	uint8_t tx_id[SHA256_DIGEST_LENGTH];
+	tx_out_t out;
+} unspent_tx_out_t;
+
+typedef unspent_tx_out_t utxo_t;
+
+/**
  * struct tx_in_s - Transaction input
  *
  * Description: A transaction input always refers to a previous
@@ -57,23 +76,11 @@ typedef struct tx_in_s
 	sig_t sig;
 } tx_in_t;
 
-/**
- * struct unspent_tx_out_s - Unspent transaction output
- *
- * Description: This structure helps identify transaction outputs that were not
- * used in any transaction input yet, making them "available".
- *
- * @block_hash: Hash of the Block containing the transaction @tx_id
- * @tx_id:      ID of the transaction containing @out
- * @out:        Copy of the referenced transaction output
- */
-typedef struct unspent_tx_out_s
-{
-	uint8_t block_hash[SHA256_DIGEST_LENGTH];
-	uint8_t tx_id[SHA256_DIGEST_LENGTH];
-	tx_out_t out;
-} unspent_tx_out_t;
 
+/* Functions prototypes */
 tx_out_t *tx_out_create(uint32_t amount, uint8_t const pub[EC_PUB_LEN]);
+
+utxo_t *unspent_tx_out_create(uint8_t block_hash[SHA256_DIGEST_LENGTH],
+							  uint8_t tx_id[SHA256_DIGEST_LENGTH], tx_out_t const *out);
 
 #endif /* TRANSACTION_H */

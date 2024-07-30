@@ -10,6 +10,7 @@
 #include "../../crypto/hblk_crypto.h"
 #include "./provided/endianness.h"
 #include <time.h>
+#include "transaction.h"
 
 #define HBLK_MAGIC "HBLK"
 #define LEN_MAGIC 4

@@ -7,6 +7,7 @@ LIB_NAME = libhblk_crypto.a
 
 $(LIB_NAME): $(OBJ_FILES)
 	ar rcs $@ $^
+	make clean_obj
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

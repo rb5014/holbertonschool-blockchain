@@ -24,7 +24,7 @@
 /* Defines how often (in Blocks) the difficulty should be adjusted */
 #define DIFFICULTY_ADJUSTMENT_INTERVAL 5
 
-#define COINBASE_AMOUNT 50
+
 
 /**
  * struct blockchain_s - Blockchain structure

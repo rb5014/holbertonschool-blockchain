@@ -27,7 +27,7 @@ uint8_t *transaction_hash(transaction_t const *transaction,
 {
 	uint8_t *buf;
 	size_t buf_size;
-	uint8_t size_inputs, size_outputs;
+	size_t size_inputs, size_outputs;
 
 	if (!transaction || hash_buf == NULL)
 		return (NULL);

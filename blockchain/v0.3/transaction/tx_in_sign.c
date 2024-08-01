@@ -34,7 +34,7 @@ sig_t *tx_in_sign(tx_in_t *in, uint8_t const tx_id[SHA256_DIGEST_LENGTH],
 	if (!in || tx_id == NULL || !sender || !all_unspent)
 		return (NULL);
 
-	/* get public key fron EC_KEY struct of sender */
+	/* Get public key fron EC_KEY struct of sender */
 	if (!ec_to_pub(sender, pub))
 		return (NULL);
 

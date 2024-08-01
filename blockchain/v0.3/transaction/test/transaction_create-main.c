@@ -54,6 +54,9 @@ int main(void)
 	EC_KEY_free(sender);
 	EC_KEY_free(receiver);
 	free(out);
+	llist_destroy(transaction->inputs, 1, NULL);
+	llist_destroy(transaction->outputs, 1, NULL);
+	free(transaction);
 	llist_destroy(all_unspent, 1, free);
 	return (EXIT_SUCCESS);
 }

@@ -1,7 +1,7 @@
 #include "transaction.h"
 
 int verify_input(llist_node_t node, unsigned int idx, void *arg);
-int are_hashes_matching(llist_node_t node, void *arg);
+int are_in_out_matching(llist_node_t node, void *arg);
 int add_amount(llist_node_t node, unsigned int idx, void *arg);
 
 /**
@@ -72,8 +72,8 @@ int verify_input(llist_node_t node, unsigned int idx, void *arg)
 	utxo_t *ref_utxo;
 	EC_KEY *ref_utxo_key;
 
-	ref_utxo = llist_find_node(all_unspent, are_hashes_matching,
-							   tx_in->tx_out_hash);
+	ref_utxo = llist_find_node(all_unspent, are_in_out_matching,
+							   tx_in);
 	if (!ref_utxo)
 		return (-1); /* Input's reference to utxo not present in all_unspent */
 
@@ -98,22 +98,28 @@ int verify_input(llist_node_t node, unsigned int idx, void *arg)
 }
 
 /**
- * are_hashes_matching - check that utxo hash is equal to
- *						 tx_out_hash from a tx_in
- * @node: void pointer of utxo containing the tx_out containing the hash
- * @arg: void pointer the tx_out_hash, referenced by the tx_in
+ * are_in_out_matching - check that the tx_in matches a utxo in all_unspent
+ * @node: void pointer of utxo containing the tx_out  to compare with
+ * @arg: void pointer the tx_in to compare with
  *
  * Return: 1 if equals, 0 otherwise
 */
-int are_hashes_matching(llist_node_t node, void *arg)
+int are_in_out_matching(llist_node_t node, void *arg)
 {
 	utxo_t *utxo = (utxo_t *) node;
-	uint8_t *tx_out_hash = (uint8_t *) arg;
+	tx_in_t *tx_in = (tx_in_t *) arg;
 
-	if (memcmp(tx_out_hash, utxo->out.hash, SHA256_DIGEST_LENGTH) == 0)
-		return (1);  /* Equals */
+	if (memcmp(tx_in->block_hash, utxo->block_hash,
+			   SHA256_DIGEST_LENGTH) != 0)
+		return (0);
 
-	return (0);
+	if (memcmp(tx_in->tx_id, utxo->tx_id, SHA256_DIGEST_LENGTH) != 0)
+		return (0);
+
+	if (memcmp(tx_in->tx_out_hash, utxo->out.hash, SHA256_DIGEST_LENGTH) != 0)
+		return (0);
+
+	return (1);   /* Equals */
 }
 
 /**

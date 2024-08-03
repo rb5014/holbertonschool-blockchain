@@ -27,22 +27,25 @@ uint8_t
 	len = sizeof(block->info) + block->data.len +
 		  (llist_size(block->transactions) * SHA256_DIGEST_LENGTH);
 
-	bytes_seq = malloc(len);
+	bytes_seq = calloc(1, len);
+	if (!bytes_seq)
+		return (NULL);
+
 	current_pos = &bytes_seq;
 
-	/* Add block info to bytes sequence and move current pos */
-	memcpy(*current_pos, &(block->info), sizeof(block->info));
-	*current_pos += sizeof(block->info);
-
-	/* Add len bytes of block data to bytes sequence and move current pos */
-	memcpy(*current_pos, &(block->data), block->data.len);
-	*current_pos += block->data.len;
+	/* Add block info + block data to bytes sequence and move current pos */
+	memcpy(*current_pos, block, sizeof(block->info) + block->data.len);
+	*current_pos += sizeof(block->info) + block->data.len;
 
 	/* Add each transaction id to the bytes sequence */
 	llist_for_each(block->transactions, add_tx_id_to_bytes_seq,
 				   current_pos);
+	/* Compute hash */
+	sha256((int8_t const *)bytes_seq, len, hash_buf);
 
-	return (sha256((int8_t const *)bytes_seq, len, hash_buf));
+	free(bytes_seq);
+
+	return (hash_buf);
 }
 
 /**

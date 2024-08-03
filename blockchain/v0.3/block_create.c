@@ -8,14 +8,22 @@
  *            If data_len is bigger than BLOCKCHAIN_DATA_MAX, then only
  *            BLOCKCHAIN_DATA_MAX bytes must be duplicated.
  *
- * Description: The new Block's index will be set to the previous Block's
- *              index + 1. The new Block's difficulty and nonce will both
- *              be initialized to 0. The new Block's timestamp will be
- *              initialized using the time(2) system call. The new Block's
- *              hash will be zeroed. The function returns a pointer to the
- *              allocated Block.
- *
  * Return: A pointer to the allocated Block, or NULL if allocation fails.
+ * 
+ * Description: The new Block's index will be set to the previous Block's
+ *              index + 1.
+ *
+ *				The new Block's difficulty and nonce will both
+ *              be initialized to 0.
+ *
+ *				The new Block's timestamp will be
+ *              initialized using the time(2) system call.
+ *
+ *				The new Block's hash will be zeroed.
+ *
+ *				Initializes the Block’s transaction list to an empty linked list.
+ *
+
  */
 block_t
 *block_create(block_t const *prev, int8_t const *data, uint32_t data_len)
@@ -45,6 +53,14 @@ block_t
 			data_len = BLOCKCHAIN_DATA_MAX;
 		memcpy(new_block->data.buffer, data, data_len);
 		new_block->data.len = data_len;
+	}
+
+	/* transaction empty list creation */
+	new_block->transactions = llist_create(MT_SUPPORT_FALSE);
+	if (!new_block->transactions)
+	{
+		free(new_block);
+		return (NULL);
 	}
 
 	return (new_block);

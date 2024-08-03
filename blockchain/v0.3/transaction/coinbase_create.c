@@ -2,14 +2,14 @@
 
 
 /**
- * coinbase_create - creates a coinbase transaction.
+ * coinbase_create - Creates a coinbase transaction.
  *
- * @receiver: contains the public key of the miner,
+ * @receiver: Contains the public key of the miner,
  *			  who will receive the coinbase coins.
- * @block_index: is the index of the Block the coinbase
+ * @block_index: Index of the Block the coinbase
  *				 transaction will belong to.
  *
- * Return: pointer to the created transaction upon success,
+ * Return: Pointer to the created transaction upon success,
  *		   or NULL upon failure.
  *
  * The resulting transaction contains a single transaction input

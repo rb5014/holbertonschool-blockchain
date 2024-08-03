@@ -20,7 +20,8 @@ blockchain_t *blockchain_create(void)
 		return (NULL);
 
 	new_bchain->chain = llist_create(MT_SUPPORT_FALSE);
-	if (!new_bchain->chain)
+	new->bchain->unspent = llist_create(MT_SUPPORT_FALSE);
+	if (!new_bchain->chain || !new_bchain->unspent)
 	{
 		free(new_bchain);
 		return (NULL);

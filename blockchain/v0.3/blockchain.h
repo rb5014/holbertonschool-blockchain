@@ -116,7 +116,8 @@ int blockchain_serialize(blockchain_t const *blockchain, char const *path);
 
 blockchain_t *blockchain_deserialize(char const *path);
 
-int block_is_valid(block_t const *block, block_t const *prev_block);
+int block_is_valid(block_t const *block, block_t const *prev_block,
+				   llist_t *all_unspent);
 
 int hash_matches_difficulty(uint8_t const hash[SHA256_DIGEST_LENGTH],
 							uint32_t difficulty);

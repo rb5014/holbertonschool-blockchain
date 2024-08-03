@@ -1,7 +1,7 @@
 #include "blockchain.h"
 
 /* Defined at the end of file */
-int add_tx_to_bytes_seq(llist_node_t node, unsigned int idx, void *arg);
+int add_tx_id_to_bytes_seq(llist_node_t node, unsigned int idx, void *arg);
 
 /**
  * block_hash - Computes the hash of a Block
@@ -23,8 +23,9 @@ uint8_t
 
 	memset(hash_buf, 0, SHA256_DIGEST_LENGTH);
 
+	/* We add the transactions ids (hash), not the full transaction */
 	len = sizeof(block->info) + block->data.len +
-		  (llist_size(block->transactions) * sizeof(transaction_t));
+		  (llist_size(block->transactions) * SHA256_DIGEST_LENGTH);
 
 	bytes_seq = malloc(len);
 	current_pos = &bytes_seq;
@@ -37,28 +38,27 @@ uint8_t
 	memcpy(*current_pos, &(block->data), block->data.len);
 	*current_pos += block->data.len;
 
-	/* Add each transaction to the bytes sequence */
-	llist_for_each(block->transactions, add_tx_to_bytes_seq,
+	/* Add each transaction id to the bytes sequence */
+	llist_for_each(block->transactions, add_tx_id_to_bytes_seq,
 				   current_pos);
-
 
 	return (sha256((int8_t const *)bytes_seq, len, hash_buf));
 }
 
 /**
- * add_tx_to_bytes_seq - copy transaction node to bytes sequence
+ * add_tx_id_to_bytes_seq - copy transaction id (hash) to bytes sequence
  * @node: void pointer to transaction_t tx
  * @idx: index of node (unused)
  * @arg: void pointer to current position of bytes sequence buffer
  *
  * Return: 0
 */
-int add_tx_to_bytes_seq(llist_node_t node, unsigned int idx, void *arg)
+int add_tx_id_to_bytes_seq(llist_node_t node, unsigned int idx, void *arg)
 {
 	transaction_t *tx = (transaction_t *) node;
 	int8_t **current_pos = (int8_t **) arg;
 
-	memcpy(*current_pos, tx, sizeof(*tx));
+	memcpy(*current_pos, tx->id, SHA256_DIGEST_LENGTH);
 
 	*current_pos += sizeof(*tx);
 

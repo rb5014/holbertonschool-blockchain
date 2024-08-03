@@ -21,8 +21,12 @@
  *          iteration of the Blockchain.
  *	8. The Block data length must not exceed BLOCKCHAIN_DATA_MAX
  *	9. The Block hash matches its difficulty
+ * 10. The Block must have at least one transaction, and the first one must be
+ *	   a coinbase transaction
+ * 11. All transactions must be valid
 */
-int block_is_valid(block_t const *block, block_t const *prev_block)
+int block_is_valid(block_t const *block, block_t const *prev_block,
+				   llist_t *all_unspent)
 {
 	uint8_t hash_buf[SHA256_DIGEST_LENGTH];
 
@@ -57,7 +61,25 @@ int block_is_valid(block_t const *block, block_t const *prev_block)
 	if (block->data.len > BLOCKCHAIN_DATA_MAX)
 		return (-1);
 
+	/* 10*/
+	if (llist_size(block->transactions) < 1 ||
+		coinbase_is_valid(llist_get_head(block->transactions)) == 0)
+		return (-1);
+
+	if (llist_for_each(block->transaction, call_transaction_is_valid, arg) == -1)
+		return (-1)
+
 	return (0);
 
 }
 
+/**
+ * call_transaction_is_valid - call the function transaction_is_valid
+ * @node: void pointer to transaction_t tx
+ * @idx: index of the node (unused)
+ * @arg: pointer to utxo_t all_unspent list
+*/
+int call_transaction_is_valid(llist_node_t node, unsigned int idx, void *arg)
+{
+	transaction_t *tx = 
+}

@@ -9,7 +9,7 @@
  *            BLOCKCHAIN_DATA_MAX bytes must be duplicated.
  *
  * Return: A pointer to the allocated Block, or NULL if allocation fails.
- * 
+ *
  * Description: The new Block's index will be set to the previous Block's
  *              index + 1.
  *
@@ -23,7 +23,7 @@
  *
  *				Initializes the Block’s transaction list to an empty linked list.
  *
-
+ *
  */
 block_t
 *block_create(block_t const *prev, int8_t const *data, uint32_t data_len)

@@ -31,5 +31,7 @@ transaction_destroy: clean
 block_create_destroy: clean
 	gcc -g -std=c90 -Wall -Wextra -pedantic -g3 -I. -Itransaction/ -Iprovided/ -I../../crypto -o block_create_destroy-test *.c test/*.c provided/*.c transaction/transaction_destroy.c -L../../crypto -lhblk_crypto -lllist -lssl -lcrypto -pthread
 
+block_hash: clean
+	gcc -g -std=c90 -Wall -Wextra -pedantic -g3 -I. -Itransaction/ -Iprovided/ -I../../crypto -o block_hash-test blockchain_create.c block_create.c block_destroy.c blockchain_destroy.c block_hash.c transaction/tx_out_create.c transaction/tx_in_create.c transaction/transaction_hash.c transaction/coinbase_create.c transaction/transaction_destroy.c provided/_genesis.c provided/_print_hex_buffer.c provided/_blockchain_print.c provided/_transaction_print.c provided/_transaction_print_brief.c test/block_hash-main.c -L../../crypto -lhblk_crypto -lllist -lssl -lcrypto -pthread
 clean:
 	rm -f *-test ./transaction/*-test

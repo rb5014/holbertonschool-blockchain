@@ -22,6 +22,7 @@ int main(void)
 	block = llist_get_head(blockchain->chain);
 
 	block = block_create(block, (int8_t *)"Holberton", 9);
+	block->info.timestamp = 1541634598;
 	llist_add_node(block->transactions,
 				   coinbase_create(owner, block->info.index),
 				   ADD_NODE_REAR);

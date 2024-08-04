@@ -16,7 +16,7 @@ uint8_t
 *block_hash(block_t const *block, uint8_t hash_buf[SHA256_DIGEST_LENGTH])
 {
 	size_t len;
-	int8_t *bytes_seq, **current_pos;
+	int8_t *bytes_seq, *current_pos;
 
 	if (!block || (hash_buf == NULL))
 		return (NULL);
@@ -31,15 +31,15 @@ uint8_t
 	if (!bytes_seq)
 		return (NULL);
 
-	current_pos = &bytes_seq;
+	current_pos = bytes_seq;
 
 	/* Add block info + block data to bytes sequence and move current pos */
-	memcpy(*current_pos, block, sizeof(block->info) + block->data.len);
-	*current_pos += sizeof(block->info) + block->data.len;
+	memcpy(current_pos, block, sizeof(block->info) + block->data.len);
+	current_pos += sizeof(block->info) + block->data.len;
 
 	/* Add each transaction id to the bytes sequence */
 	llist_for_each(block->transactions, add_tx_id_to_bytes_seq,
-				   current_pos);
+				   &current_pos);
 	/* Compute hash */
 	sha256((int8_t const *)bytes_seq, len, hash_buf);
 

@@ -7,6 +7,7 @@ int check_transaction(llist_node_t node, unsigned int idx, void *arg);
  * @block: Pointer to the Block to check
  * @prev_block: Pointer to the previous Block in the Blockchain,
  *				or is NULL if block is the first Block of the chain
+ * @all_unspent: pointer to llist_t of all utxos
  * Return: 0 if success, -1 otherwise
  *
  * The following requirements must be fulfilled for a Block to be valid:
@@ -43,7 +44,7 @@ int block_is_valid(block_t const *block, block_t const *prev_block,
 	if (hash_matches_difficulty(block->hash, block->info.difficulty) == 0)
 		return (-1);
 
-	if (prev_block) 
+	if (prev_block)
 	{
 		/* 4 */
 		if (block->info.index != (prev_block->info.index + 1))
@@ -51,7 +52,7 @@ int block_is_valid(block_t const *block, block_t const *prev_block,
 		/* 5 */
 
 		block_hash(prev_block, hash_buf);
-		
+
 		if (memcmp(prev_block->hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
 			return (-1);
 		/* 6 */
@@ -66,9 +67,8 @@ int block_is_valid(block_t const *block, block_t const *prev_block,
 	if (block->data.len > BLOCKCHAIN_DATA_MAX)
 		return (-1);
 
-	/* 10*/
-	if (llist_size(block->transactions) < 1 ||
-		coinbase_is_valid(llist_get_head(block->transactions), block->info.index) == 0)
+	/* 10 && 11*/
+	if (llist_size(block->transactions) < 1)
 		return (-1);
 
 	arg[0] = &(block->info.index), arg[1] = all_unspent;
@@ -84,9 +84,9 @@ int block_is_valid(block_t const *block, block_t const *prev_block,
  * @node: void pointer to transaction_t tx
  * @idx: index of the node
  * @arg: pointer to utxo_t all_unspent list
- * 
+ *
  * Return: 0 if success, -1 otherwise
- * 
+ *
  * All transaction can be coinbase transaction
  * and 1st transaction can only be a coinbase transaction
 */
@@ -102,7 +102,7 @@ int check_transaction(llist_node_t node, unsigned int idx, void *arg)
 
 	if ((idx > 0) && (transaction_is_valid(tx, all_unspent) == 0))
 		return (-1);
-	
+
 	idx = idx;
 	return (0);
 }

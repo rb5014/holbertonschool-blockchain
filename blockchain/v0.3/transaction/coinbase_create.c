@@ -48,6 +48,7 @@ transaction_t *coinbase_create(EC_KEY const *receiver, uint32_t block_index)
 	memset(tx_in, 0, sizeof(*tx_in));
 	memcpy(tx_in->tx_out_hash, &block_index, 4);
 
+	/* Add inputs and outputs */
 	coinbase->inputs = llist_create(MT_SUPPORT_FALSE);
 	coinbase->outputs = llist_create(MT_SUPPORT_FALSE);
 

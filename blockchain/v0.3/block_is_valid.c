@@ -1,5 +1,7 @@
 #include "blockchain.h"
 
+int check_transaction(llist_node_t node, unsigned int idx, void *arg);
+
 /**
  * block_is_valid - Verifies that a Block is valid
  * @block: Pointer to the Block to check
@@ -29,6 +31,7 @@ int block_is_valid(block_t const *block, block_t const *prev_block,
 				   llist_t *all_unspent)
 {
 	uint8_t hash_buf[SHA256_DIGEST_LENGTH];
+	void const *arg[2];
 
 	/* 1 && 2 */
 	if (!block || (!prev_block && (block->info.index != 0)))
@@ -39,17 +42,19 @@ int block_is_valid(block_t const *block, block_t const *prev_block,
 	/* 9 */
 	if (hash_matches_difficulty(block->hash, block->info.difficulty) == 0)
 		return (-1);
-	if (prev_block)
+
+	if (prev_block) 
 	{
 		/* 4 */
 		if (block->info.index != (prev_block->info.index + 1))
 			return (-1);
 		/* 5 */
+
 		block_hash(prev_block, hash_buf);
+		
 		if (memcmp(prev_block->hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
 			return (-1);
 		/* 6 */
-		block_hash(prev_block, hash_buf);
 		if (memcmp(block->info.prev_hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
 			return (-1);
 	}
@@ -63,23 +68,41 @@ int block_is_valid(block_t const *block, block_t const *prev_block,
 
 	/* 10*/
 	if (llist_size(block->transactions) < 1 ||
-		coinbase_is_valid(llist_get_head(block->transactions)) == 0)
+		coinbase_is_valid(llist_get_head(block->transactions), block->info.index) == 0)
 		return (-1);
 
-	if (llist_for_each(block->transaction, call_transaction_is_valid, arg) == -1)
-		return (-1)
+	arg[0] = &(block->info.index), arg[1] = all_unspent;
+	if (llist_for_each(block->transactions, check_transaction, arg) == -1)
+		return (-1);
 
 	return (0);
 
 }
 
 /**
- * call_transaction_is_valid - call the function transaction_is_valid
+ * check_transaction - check if transaction is valid
  * @node: void pointer to transaction_t tx
- * @idx: index of the node (unused)
+ * @idx: index of the node
  * @arg: pointer to utxo_t all_unspent list
+ * 
+ * Return: 0 if success, -1 otherwise
+ * 
+ * All transaction can be coinbase transaction
+ * and 1st transaction can only be a coinbase transaction
 */
-int call_transaction_is_valid(llist_node_t node, unsigned int idx, void *arg)
+int check_transaction(llist_node_t node, unsigned int idx, void *arg)
 {
-	transaction_t *tx = 
+	void **ptr = arg;
+	transaction_t *tx = (transaction_t *) node;
+	uint32_t *block_index = (uint32_t *) ptr[0];
+	llist_t *all_unspent = (llist_t *) ptr[1];
+
+	if ((idx == 0) && coinbase_is_valid(tx, *block_index) == 0)
+		return (-1);
+
+	if ((idx > 0) && (transaction_is_valid(tx, all_unspent) == 0))
+		return (-1);
+	
+	idx = idx;
+	return (0);
 }

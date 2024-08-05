@@ -22,12 +22,13 @@ uint8_t
 		return (NULL);
 
 	memset(hash_buf, 0, SHA256_DIGEST_LENGTH);
+	len = sizeof(block->info) + block->data.len;
 
-	/* We add the transactions ids (hash), not the full transaction */
-	len = sizeof(block->info) + block->data.len +
-		  (llist_size(block->transactions) * SHA256_DIGEST_LENGTH);
+	if (block->transactions)
+		/* We add the transactions ids (hash), not the full transaction */
+		len += llist_size(block->transactions) * SHA256_DIGEST_LENGTH;
 
-	bytes_seq = calloc(1, len);
+	bytes_seq = malloc(len);
 	if (!bytes_seq)
 		return (NULL);
 

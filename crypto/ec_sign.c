@@ -14,10 +14,11 @@
 uint8_t
 *ec_sign(EC_KEY const *key, uint8_t const *msg, size_t msglen, sig_t *sig)
 {
+	unsigned int sig_len = SIG_MAX_LEN;
+
 	if (!key || !msg || !sig)
 		return (NULL);
 
-	unsigned int sig_len = SIG_MAX_LEN;
 
 	/* Sign the message */
 	if (ECDSA_sign(0, msg, msglen, sig->sig, &sig_len,

@@ -118,7 +118,7 @@ int is_utxo_matching_with_input(llist_node_t node, void *arg)
 	tx_in_t *tx_in = (tx_in_t *) node;
 	utxo_t *utxo = (utxo_t *) arg;
 
-	if (memcpy(tx_in->block_hash, utxo->block_hash, SHA256_DIGEST_LENGTH) == 0)
+	if (memcpy(tx_in->tx_out_hash, utxo->out.hash, SHA256_DIGEST_LENGTH) == 0)
 		return (1);
 
 	return (0);

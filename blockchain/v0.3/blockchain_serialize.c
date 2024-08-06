@@ -42,7 +42,7 @@ int blockchain_serialize(blockchain_t const *blockchain, char const *path)
 		SWAPENDIAN(nb_unspent);
 	}
 	fwrite(&nb_blocks, sizeof(nb_blocks), 1, file);
-
+	fwrite(&nb_unspent, sizeof(nb_unspent), 1, file);
 	/* Write each block */
 	for (i = 0; i < nb_blocks; i++)
 	{
@@ -123,7 +123,7 @@ int block_serialize(block_t *block, FILE *file)
 	fwrite(&(nb_transactions), sizeof(nb_transactions), 1, file);
 	for (i = 0; i < nb_transactions; i++)
 	{
-		transactions_t *tx = llist_get_node_at(block->transactions, i);
+		transaction_t *tx = llist_get_node_at(block->transactions, i);
 
 		if (tx_serialize(tx, file) == -1)
 			return (-1);
@@ -154,8 +154,8 @@ int tx_serialize(transaction_t *tx, FILE *file)
 		SWAPENDIAN(nb_outputs);
 	}
 	fwrite(tx->id, SHA256_DIGEST_LENGTH, 1, file);
-	fwrite(nb_inputs, sizeof(nb_inputs), 1, file);
-	fwrite(nb_outputs, sizeof(nb_outputs), 1, file);
+	fwrite(&nb_inputs, sizeof(nb_inputs), 1, file);
+	fwrite(&nb_outputs, sizeof(nb_outputs), 1, file);
 
 	for (i = 0; i < nb_inputs; i++)
 	{

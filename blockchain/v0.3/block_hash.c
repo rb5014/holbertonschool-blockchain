@@ -17,16 +17,16 @@ uint8_t
 {
 	size_t len;
 	int8_t *bytes_seq, *current_pos;
+	int num_transactions = 0;
 
 	if (!block || (hash_buf == NULL))
 		return (NULL);
 
 	memset(hash_buf, 0, SHA256_DIGEST_LENGTH);
 	len = sizeof(block->info) + block->data.len;
-
-	if (block->transactions)
-		/* We add the transactions ids (hash), not the full transaction */
-		len += llist_size(block->transactions) * SHA256_DIGEST_LENGTH;
+	num_transactions = llist_size(block->transactions);
+	if (num_transactions > 0)
+		len += num_transactions * SHA256_DIGEST_LENGTH;
 
 	bytes_seq = malloc(len);
 	if (!bytes_seq)
@@ -36,11 +36,16 @@ uint8_t
 
 	/* Add block info + block data to bytes sequence and move current pos */
 	memcpy(current_pos, block, sizeof(block->info) + block->data.len);
-	current_pos += sizeof(block->info) + block->data.len;
 
 	/* Add each transaction id to the bytes sequence */
-	llist_for_each(block->transactions, add_tx_id_to_bytes_seq,
-				   &current_pos);
+	if (num_transactions > 0)
+	{
+		current_pos += sizeof(block->info) + block->data.len;
+		/* We add the transactions ids (hash), not the full transaction */
+		llist_for_each(block->transactions, add_tx_id_to_bytes_seq,
+					   &current_pos);
+	}
+
 	/* Compute hash */
 	sha256((int8_t const *)bytes_seq, len, hash_buf);
 
@@ -64,7 +69,7 @@ int add_tx_id_to_bytes_seq(llist_node_t node, unsigned int idx, void *arg)
 
 	memcpy(*current_pos, tx->id, SHA256_DIGEST_LENGTH);
 
-	*current_pos += sizeof(*tx);
+	*current_pos += SHA256_DIGEST_LENGTH;
 
 	idx = idx;
 	return (0);

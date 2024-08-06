@@ -53,6 +53,7 @@ static block_t *_add_block(blockchain_t *blockchain, block_t const *prev,
 	}
 	llist_for_each(transaction->inputs, (node_func_t)_clear_signatures, NULL);
 
+	EC_KEY_free(receiver);
 	return (block);
 }
 
@@ -90,5 +91,6 @@ int main(void)
 
 	blockchain_destroy(blockchain);
 	EC_KEY_free(miner);
+	free(out);
 	return (EXIT_SUCCESS);
 }

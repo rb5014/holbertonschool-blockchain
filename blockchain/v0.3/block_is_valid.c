@@ -1,5 +1,7 @@
 #include "blockchain.h"
 
+/* Defined after */
+int check_prev_block(block_t const *block, block_t const *prev_block);
 int check_transaction(llist_node_t node, unsigned int idx, void *arg);
 
 /**
@@ -34,31 +36,22 @@ int block_is_valid(block_t const *block, block_t const *prev_block,
 	uint8_t hash_buf[SHA256_DIGEST_LENGTH];
 	void const *arg[2];
 
-	/* 1 && 2 */
+	/* 1 & 2 */
 	if (!block || (!prev_block && (block->info.index != 0)))
 		return (-1);
+
 	/* 3 */
 	if ((block->info.index == 0) && (memcmp(block, &_genesis, sizeof(block_t))))
 		return (-1);
+
 	/* 9 */
 	if (hash_matches_difficulty(block->hash, block->info.difficulty) == 0)
 		return (-1);
 
-	if (prev_block)
-	{
-		/* 4 */
-		if (block->info.index != (prev_block->info.index + 1))
-			return (-1);
-		/* 5 */
+	/* 4 & 5 & 6 */
+	if (prev_block && check_prev_block(block, prev_block) == -1)
+		return (-1);
 
-		block_hash(prev_block, hash_buf);
-
-		if (memcmp(prev_block->hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
-			return (-1);
-		/* 6 */
-		if (memcmp(block->info.prev_hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
-			return (-1);
-	}
 	/* 7 */
 	block_hash(block, hash_buf);
 	if (memcmp(block->hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
@@ -67,7 +60,7 @@ int block_is_valid(block_t const *block, block_t const *prev_block,
 	if (block->data.len > BLOCKCHAIN_DATA_MAX)
 		return (-1);
 
-	/* 10 && 11*/
+	/* 10 & 11*/
 	if (llist_size(block->transactions) < 1)
 		return (-1);
 
@@ -77,6 +70,34 @@ int block_is_valid(block_t const *block, block_t const *prev_block,
 
 	return (0);
 
+}
+
+/**
+ * check_prev_block - check prev block index and hash
+ * and also prev block reference hash in block
+ * @block: Pointer to the Block to check
+ * @prev_block: Pointer to the previous Block in the Blockchain
+ *
+ * Return: 0 if success, -1 on failure
+*/
+int check_prev_block(block_t const *block, block_t const *prev_block)
+{
+	uint8_t hash_buf[SHA256_DIGEST_LENGTH];
+
+	/* 4 */
+	if (block->info.index != (prev_block->info.index + 1))
+		return (-1);
+
+	/* 5 */
+	block_hash(prev_block, hash_buf);
+	if (memcmp(prev_block->hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
+		return (-1);
+
+	/* 6 */
+	if (memcmp(block->info.prev_hash, hash_buf, SHA256_DIGEST_LENGTH) != 0)
+		return (-1);
+
+	return (0);
 }
 
 /**

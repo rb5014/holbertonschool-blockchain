@@ -17,13 +17,16 @@ uint8_t
 	if (!key || !msg || !sig)
 		return (NULL);
 
+	unsigned int sig_len = SIG_MAX_LEN;
+
 	/* Sign the message */
-	if (ECDSA_sign(0, msg, msglen, sig->sig, (unsigned int *) &(sig->len),
+	if (ECDSA_sign(0, msg, msglen, sig->sig, &sig_len,
 				   (EC_KEY *) key) == 0)
 	{
 		return (NULL);
 	}
 
+	sig->len = sig_len;
 	/* Return the signature */
 	return (sig->sig);
 }

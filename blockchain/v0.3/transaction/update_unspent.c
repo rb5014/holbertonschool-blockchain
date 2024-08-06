@@ -2,7 +2,7 @@
 
 /* Defined after */
 int add_ins_outs(llist_node_t node, unsigned int idx, void *arg);
-int add_input(llist_node_t node, unsigned int idx, void *arg);
+int remove_input(llist_node_t node, unsigned int idx, void *arg);
 int is_utxo_matching_with_input(llist_node_t node, void *arg);
 int add_output(llist_node_t node, unsigned int idx, void *arg);
 
@@ -28,26 +28,16 @@ int add_output(llist_node_t node, unsigned int idx, void *arg);
 llist_t *update_unspent(llist_t *transactions,
 						uint8_t block_hash[SHA256_DIGEST_LENGTH], llist_t *all_unspent)
 {
-	llist_t *updated_unspent;
 	void *arg[3] = {0};
 
 	if (!transactions || (block_hash == NULL) || !all_unspent)
 		return (NULL);
 
-	updated_unspent = llist_create(MT_SUPPORT_FALSE);
-	if (!updated_unspent)
-		return (NULL);
-
-	arg[0] = &updated_unspent, arg[1] = all_unspent, arg[2] = block_hash;
+	arg[0] = &all_unspent, arg[1] = block_hash;
 	if (llist_for_each(transactions, add_ins_outs, arg) == -1)
-	{
-		llist_destroy(updated_unspent, 1, NULL);
 		return (NULL);
-	}
 
-	llist_destroy(all_unspent, 0, NULL);
-
-	return (updated_unspent);
+	return (all_unspent);
 }
 
 /**
@@ -62,16 +52,12 @@ int add_ins_outs(llist_node_t node, unsigned int idx, void *arg)
 {
 	transaction_t *tx = (transaction_t *) node;
 	void **ptr = arg;
-	llist_t *all_unspent = ptr[1];
+	llist_t **all_unspent = (llist_t **) ptr[0];
 
-	/* Replace all_unspent with tx->inputs because not used anymore */
-	ptr[1] = tx->inputs;
-	if (llist_for_each(all_unspent, add_input, ptr) == -1)
+	if (llist_for_each(tx->inputs, remove_input, all_unspent) == -1)
 		return (-1);
 
-	/* Replace tx->inputs with tx->id because not used anymore */
-	ptr[1] = tx->id;
-
+	ptr[2] = tx->id; /* Used for unspent_tx_out_create */
 	if (llist_for_each(tx->outputs, add_output, ptr) == -1)
 		return (-1);
 
@@ -80,26 +66,19 @@ int add_ins_outs(llist_node_t node, unsigned int idx, void *arg)
 }
 
 /**
- * add_input - add input to updated unspent if not in list of inputs
- *
- * @node: void pointer to current utxo_t utxo of old unspent list
+ * remove_input - remove utxo if reference by tx_in
+ * @node: void pointer to current tx_in
  * @idx: idx of the node (unused)
- * @arg: pointer to void pointers to args:
- *	0: address of unspent list to fill
- *  1: list of inputs to use to find the inputs to NOT add to unspent list
- *  2: block_hash of transaction (not used here)
+ * @arg: address of all_unspent list_t *
  *
- * Return: 0 if success, -1 on failure
+ * Return: 0
 */
-int add_input(llist_node_t node, unsigned int idx, void *arg)
+int remove_input(llist_node_t node, unsigned int idx, void *arg)
 {
-	utxo_t *utxo = (utxo_t *) node;
-	void **ptr = arg;
-	llist_t **updated_unspent = (llist_t **) ptr[0];
-	llist_t *inputs = (llist_t *) ptr[1];
+	tx_in_t *tx_in = (tx_in_t *) node;
+	llist_t **all_unspent = arg;
 
-	if (llist_find_node(inputs, is_utxo_matching_with_input, utxo) == NULL)
-		llist_add_node(*updated_unspent, utxo, ADD_NODE_REAR);
+	llist_remove_node(*all_unspent, is_utxo_matching_with_input, tx_in, 1, NULL);
 
 	return (0);
 	(void)idx;
@@ -115,8 +94,8 @@ int add_input(llist_node_t node, unsigned int idx, void *arg)
 */
 int is_utxo_matching_with_input(llist_node_t node, void *arg)
 {
-	tx_in_t *tx_in = (tx_in_t *) node;
-	utxo_t *utxo = (utxo_t *) arg;
+	utxo_t *utxo = (utxo_t *) node;
+	tx_in_t *tx_in = (tx_in_t *) arg;
 
 	if (memcpy(tx_in->tx_out_hash, utxo->out.hash, SHA256_DIGEST_LENGTH) == 0)
 		return (1);
@@ -137,8 +116,8 @@ int add_output(llist_node_t node, unsigned int idx, void *arg)
 	tx_out_t *tx_out = (tx_out_t *) node;
 	void **ptr = arg;
 	llist_t **all_unspent = (llist_t **) ptr[0];
-	uint8_t *tx_id = (uint8_t *) ptr[1];
-	uint8_t *block_hash = (uint8_t *) ptr[2];
+	uint8_t *block_hash = (uint8_t *) ptr[1];
+	uint8_t *tx_id = (uint8_t *) ptr[2];
 	utxo_t *utxo = unspent_tx_out_create(block_hash, tx_id, tx_out);
 
 	return (llist_add_node(*all_unspent, utxo, ADD_NODE_REAR));

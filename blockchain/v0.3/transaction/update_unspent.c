@@ -2,7 +2,7 @@
 
 /* Defined after */
 int add_ins_outs(llist_node_t node, unsigned int idx, void *arg);
-int remove_input(llist_node_t node, unsigned int idx, void *arg);
+int remove_utxo_referenced(llist_node_t node, unsigned int idx, void *arg);
 int is_utxo_matching_with_input(llist_node_t node, void *arg);
 int add_output(llist_node_t node, unsigned int idx, void *arg);
 
@@ -54,7 +54,7 @@ int add_ins_outs(llist_node_t node, unsigned int idx, void *arg)
 	void **ptr = arg;
 	llist_t **all_unspent = (llist_t **) ptr[0];
 
-	if (llist_for_each(tx->inputs, remove_input, all_unspent) == -1)
+	if (llist_for_each(tx->inputs, remove_utxo_referenced, all_unspent) == -1)
 		return (-1);
 
 	ptr[2] = tx->id; /* Used for unspent_tx_out_create */
@@ -66,14 +66,14 @@ int add_ins_outs(llist_node_t node, unsigned int idx, void *arg)
 }
 
 /**
- * remove_input - remove utxo if reference by tx_in
+ * remove_utxo_referenced - remove utxo from all_unspent if referenced by tx_in
  * @node: void pointer to current tx_in
  * @idx: idx of the node (unused)
  * @arg: address of all_unspent list_t *
  *
  * Return: 0
 */
-int remove_input(llist_node_t node, unsigned int idx, void *arg)
+int remove_utxo_referenced(llist_node_t node, unsigned int idx, void *arg)
 {
 	tx_in_t *tx_in = (tx_in_t *) node;
 	llist_t **all_unspent = arg;
@@ -97,7 +97,7 @@ int is_utxo_matching_with_input(llist_node_t node, void *arg)
 	utxo_t *utxo = (utxo_t *) node;
 	tx_in_t *tx_in = (tx_in_t *) arg;
 
-	if (memcpy(tx_in->tx_out_hash, utxo->out.hash, SHA256_DIGEST_LENGTH) == 0)
+	if (memcmp(tx_in->tx_out_hash, utxo->out.hash, SHA256_DIGEST_LENGTH) == 0)
 		return (1);
 
 	return (0);

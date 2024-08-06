@@ -137,8 +137,8 @@ int add_output(llist_node_t node, unsigned int idx, void *arg)
 	tx_out_t *tx_out = (tx_out_t *) node;
 	void **ptr = arg;
 	llist_t **all_unspent = (llist_t **) ptr[0];
-	uint8_t *block_hash = (uint8_t *) ptr[1];
-	uint8_t *tx_id = (uint8_t *) ptr[2];
+	uint8_t *tx_id = (uint8_t *) ptr[1];
+	uint8_t *block_hash = (uint8_t *) ptr[2];
 	utxo_t *utxo = unspent_tx_out_create(block_hash, tx_id, tx_out);
 
 	return (llist_add_node(*all_unspent, utxo, ADD_NODE_REAR));

@@ -1,3 +1,23 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror -pedantic -Wno-deprecated-declarations -I. -Itransaction/ 
+
+SRC_FILES = *.c transaction/*.c
+OBJ_FILES = $(SRC_FILES:.c=.o)
+LIB_NAME = libhblk_blockchain.a
+
+$(LIB_NAME): $(OBJ_FILES)
+	ar rcs $@ $^
+	make clean_obj
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -f $(OBJ_FILES) $(LIBNAME) *-test 
+
+clean_obj:
+	rm -f $(OBJ_FILES)
+
 tx_out_create: clean
 	gcc -g -std=c90 -Wall -Wextra -pedantic -g3 -I. -Itransaction/ -Iprovided/ -I../../crypto -o transaction/tx_out_create-test transaction/tx_out_create.c provided/_print_hex_buffer.c transaction/test/tx_out_create-main.c -L../../crypto -lhblk_crypto -lllist -lssl -lcrypto -pthread
 
@@ -42,6 +62,3 @@ update_unspent: clean
 
 blockchain_ser_deser: clean
 	gcc -g -std=c90 -Wall -Wextra -pedantic -g3 -I. -Itransaction/ -Iprovided/ -I../../crypto -o blockchain_ser_deser-test test/blockchain_ser_deser.c *.c transaction/*.c provided/*.c -L../../crypto -lhblk_crypto -lllist -lssl -lcrypto -pthread
-
-clean:
-	rm -f *-test ./transaction/*-test

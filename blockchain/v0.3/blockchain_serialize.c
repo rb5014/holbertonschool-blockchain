@@ -167,7 +167,7 @@ int tx_serialize(transaction_t *tx, FILE *file)
 	for (i = 0; i < nb_outputs; i++)
 	{
 		tx_out_t *tx_out = llist_get_node_at(tx->outputs, i);
-		int32_t amount = tx_out->amount;
+		uint32_t amount = tx_out->amount;
 
 		if (HBLK_ENDIAN == 0)
 			SWAPENDIAN(amount);
@@ -190,7 +190,7 @@ int tx_serialize(transaction_t *tx, FILE *file)
 int utxo_serialize(utxo_t *utxo, FILE *file)
 {
 	tx_out_t tx_out;
-	int32_t amount;
+	uint32_t amount;
 
 	if (!utxo || !file)
 		return (-1);

@@ -97,8 +97,8 @@ int main(void)
 	blockchain_serialize(blockchain, "save.hblk");
 	blockchain_destroy(blockchain);
 	blockchain = blockchain_deserialize("save.hblk");
-
 	_blockchain_print_brief(blockchain);
+	blockchain_destroy(blockchain);
 	EC_KEY_free(miner);
 
 	return (EXIT_SUCCESS);

@@ -22,6 +22,8 @@ int blockchain_serialize(blockchain_t const *blockchain, char const *path)
 	if (!blockchain || !path)
 		return (-1);
 
+
+
 	file = fopen(path, "wb");
 	if (!file)
 		return (-1);
@@ -36,7 +38,7 @@ int blockchain_serialize(blockchain_t const *blockchain, char const *path)
 		return (-1);
 	}
 	/* Write nb_blocks */
-	if (HBLK_ENDIAN == 0) /* If system is big-endian, swap to little-endian */
+	if (HBLK_ENDIAN == 2) /* If system is big-endian, swap to little-endian */
 	{
 		SWAPENDIAN(nb_blocks);
 		SWAPENDIAN(nb_unspent);
@@ -109,7 +111,7 @@ int block_serialize(block_t *block, FILE *file)
 	nb_transactions = llist_size(block->transactions);
 
 	/* Convert endianess if system is big endian */
-	if (HBLK_ENDIAN == 0)
+	if (HBLK_ENDIAN == 2)
 	{
 		SWAPENDIAN(info);
 		SWAPENDIAN(data.len);
@@ -142,17 +144,18 @@ int tx_serialize(transaction_t *tx, FILE *file)
 {
 	int32_t nb_inputs, nb_outputs, i;
 
-	if (!tx || file)
+	if (!tx || !file)
 		return (-1);
 
 	nb_inputs = llist_size(tx->inputs);
 	nb_outputs = llist_size(tx->outputs);
 
-	if (HBLK_ENDIAN == 0)
+	if (HBLK_ENDIAN == 2)
 	{
 		SWAPENDIAN(nb_inputs);
 		SWAPENDIAN(nb_outputs);
 	}
+
 	fwrite(tx->id, SHA256_DIGEST_LENGTH, 1, file);
 	fwrite(&nb_inputs, sizeof(nb_inputs), 1, file);
 	fwrite(&nb_outputs, sizeof(nb_outputs), 1, file);
@@ -169,11 +172,11 @@ int tx_serialize(transaction_t *tx, FILE *file)
 		tx_out_t *tx_out = llist_get_node_at(tx->outputs, i);
 		uint32_t amount = tx_out->amount;
 
-		if (HBLK_ENDIAN == 0)
+		if (HBLK_ENDIAN == 2)
 			SWAPENDIAN(amount);
 
 		fwrite(&amount, sizeof(amount), 1, file);
-		fwrite(tx_out->pub, SHA256_DIGEST_LENGTH, 1, file);
+		fwrite(tx_out->pub, EC_PUB_LEN, 1, file);
 		fwrite(tx_out->hash, SHA256_DIGEST_LENGTH, 1, file);
 	}
 
@@ -198,7 +201,7 @@ int utxo_serialize(utxo_t *utxo, FILE *file)
 	tx_out = utxo->out;
 	amount = tx_out.amount;
 
-	if (HBLK_ENDIAN == 0)
+	if (HBLK_ENDIAN == 2)
 		SWAPENDIAN(amount);
 
 	fwrite(utxo->block_hash, SHA256_DIGEST_LENGTH, 1, file);

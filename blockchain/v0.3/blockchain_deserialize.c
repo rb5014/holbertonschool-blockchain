@@ -22,8 +22,8 @@ blockchain_t *blockchain_deserialize(char const *path)
 {
 	FILE *file = fopen(path, "rb");
 	uint8_t file_endian;
-	blockchain_t *blockchain = malloc(sizeof(blockchain_t));
-	int32_t nb_blocks, nb_unspent, i;
+	blockchain_t *blockchain = calloc(1, sizeof(blockchain_t));
+	int32_t nb_blocks = 0, nb_unspent = 0, i;
 
 	if (!file || !blockchain)
 	{
@@ -55,12 +55,11 @@ blockchain_t *blockchain_deserialize(char const *path)
 			blockchain_destroy(blockchain);
 			return (NULL);
 		}
-
 		llist_add_node(blockchain->chain, block, ADD_NODE_REAR);
 	}
 	for (i = 0; i < nb_unspent; i++)
 	{
-		utxo_t *utxo = malloc(sizeof(*utxo));
+		utxo_t *utxo = calloc(1, sizeof(*utxo));
 
 		if (!utxo)
 		{
@@ -68,7 +67,12 @@ blockchain_t *blockchain_deserialize(char const *path)
 			blockchain_destroy(blockchain);
 			return (NULL);
 		}
-		fread(utxo, sizeof(*utxo), 1, file);
+		/* block_hash and tx_id and out.amount*/
+		fread(utxo, SHA256_DIGEST_LENGTH * 2 + sizeof(utxo->out.amount), 1, file);
+
+		fread(utxo->out.pub, EC_PUB_LEN, 1, file);
+		fread(utxo->out.hash, SHA256_DIGEST_LENGTH, 1, file);
+
 		if (file_endian != HBLK_ENDIAN)
 			SWAPENDIAN(utxo->out.amount);
 
@@ -112,13 +116,12 @@ int header_deserialize(FILE *file, uint8_t *file_endian)
 */
 block_t *block_deserialize(FILE *file, const uint8_t file_endian)
 {
-	block_t *block = malloc(sizeof(block_t));
-	int32_t nb_transactions, i;
+	block_t *block = calloc(1, sizeof(block_t));
+	int32_t nb_transactions = 0, i;
 
 	if (!block)
 		return (NULL);
 
-	memset(block, 0, sizeof(block_t));
 
 	fread(&(block->info), sizeof(block_info_t), 1, file);
 	fread(&(block->data.len), sizeof(block->data.len), 1, file);
@@ -159,8 +162,8 @@ block_t *block_deserialize(FILE *file, const uint8_t file_endian)
 */
 transaction_t *tx_deserialize(FILE *file, const uint8_t file_endian)
 {
-	transaction_t *tx = malloc(sizeof(*tx));
-	int32_t nb_inputs, nb_outputs;
+	transaction_t *tx = calloc(1, sizeof(*tx));
+	int32_t nb_inputs = 0, nb_outputs = 0;
 
 	if (!tx)
 		return (NULL);
@@ -207,7 +210,7 @@ int inputs_outputs_deserialize(FILE *file, const uint8_t file_endian,
 
 	for (i = 0; i < nb_inputs; i++)
 	{
-		tx_in_t *tx_in = malloc(sizeof(*tx_in));
+		tx_in_t *tx_in = calloc(1, sizeof(*tx_in));
 
 		if (!tx_in)
 			return (-1);
@@ -217,13 +220,14 @@ int inputs_outputs_deserialize(FILE *file, const uint8_t file_endian,
 	}
 	for (i = 0; i < nb_outputs; i++)
 	{
-		tx_out_t *tx_out = malloc(sizeof(*tx_out));
+		tx_out_t *tx_out = calloc(1, sizeof(*tx_out));
 
 		if (!tx_out)
 			return (-1);
 
-		fread(tx_out, sizeof(*tx_out), 1, file);
-
+		fread(&(tx_out->amount), sizeof(tx_out->amount), 1, file);
+		fread(tx_out->pub, EC_PUB_LEN, 1, file);
+		fread(tx_out->hash, SHA256_DIGEST_LENGTH, 1, file);
 		if (file_endian != HBLK_ENDIAN)
 			SWAPENDIAN(tx_out->amount);
 

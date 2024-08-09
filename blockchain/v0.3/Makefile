@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -pedantic -Wno-deprecated-declarations -I. -Itransaction/ 
+CFLAGS = -std=c90 -Wall -Wextra -Werror -pedantic -Wno-deprecated-declarations -I. -Itransaction/ 
 
 SRC_FILES = $(wildcard *.c transaction/*.c)
 OBJ_FILES = $(SRC_FILES:.c=.o)

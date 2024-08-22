@@ -1,7 +1,7 @@
 CC = gcc
-CFLAGS = -std=c90 -Wall -Wextra -Werror -pedantic -Wno-deprecated-declarations -I. -Itransaction/ 
+CFLAGS = -std=c90 -Wall -Wextra -Werror -pedantic -Wno-deprecated-declarations -I. -Itransaction/ -Iprovided
 
-SRC_FILES = $(wildcard *.c transaction/*.c)
+SRC_FILES = $(wildcard *.c transaction/*.c provided/*.c)
 OBJ_FILES = $(SRC_FILES:.c=.o)
 LIB_NAME = libhblk_blockchain.a
 

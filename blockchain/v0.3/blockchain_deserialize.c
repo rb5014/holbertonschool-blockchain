@@ -33,7 +33,9 @@ blockchain_t *blockchain_deserialize(char const *path)
 	}
 
 	blockchain->chain = llist_create(MT_SUPPORT_FALSE);
-	if (!blockchain->chain || header_deserialize(file, &file_endian) == -1)
+	blockchain->unspent = llist_create(MT_SUPPORT_FALSE);
+	if (!blockchain->chain || !blockchain->unspent ||
+		header_deserialize(file, &file_endian) == -1)
 	{
 		fclose(file);
 		blockchain_destroy(blockchain);
@@ -75,7 +77,7 @@ blockchain_t *blockchain_deserialize(char const *path)
 
 		if (file_endian != HBLK_ENDIAN)
 			SWAPENDIAN(utxo->out.amount);
-
+		llist_add_node(blockchain->unspent, utxo, ADD_NODE_REAR);
 	}
 	fclose(file);
 	return (blockchain);

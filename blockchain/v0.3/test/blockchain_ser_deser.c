@@ -93,10 +93,13 @@ int main(void)
 	block = _add_block(blockchain, block, "Software Engineering", miner);
 
 	_blockchain_print_brief(blockchain);
+	
+	printf("Unspent nb: %i\n", llist_size(blockchain->unspent));
 
 	blockchain_serialize(blockchain, "save.hblk");
 	blockchain_destroy(blockchain);
 	blockchain = blockchain_deserialize("save.hblk");
+	printf("Unspent nb: %i\n", llist_size(blockchain->unspent));
 	_blockchain_print_brief(blockchain);
 	blockchain_destroy(blockchain);
 	EC_KEY_free(miner);

@@ -1,5 +1,10 @@
 #include "cli.h"
 
+/**
+ * blockchain_context_create - Create a blockchain context
+ *								and all its elements
+ * Return: The newly created blockchain context structure
+*/
 blockchain_context_t *blockchain_context_create(void)
 {
 	blockchain_context_t *bchain_ctx = malloc(sizeof(*bchain_ctx));
@@ -25,6 +30,11 @@ blockchain_context_t *blockchain_context_create(void)
 	return (bchain_ctx);
 }
 
+/**
+ * blockchain_context_destroy - Destroy a blockchain context
+ *								and all its elements
+ * @bchain_ctx: the blockchain context structure to destroy
+*/
 void blockchain_context_destroy(blockchain_context_t *bchain_ctx)
 {
 	blockchain_destroy(bchain_ctx->blockchain);

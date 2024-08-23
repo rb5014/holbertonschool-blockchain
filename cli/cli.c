@@ -1,6 +1,6 @@
 #include "cli.h"
 
-
+/* List of command structures to math function name to function pointers */
 static command_t cmds[] = {
 	{"wallet_load", wallet_load},
 	{"wallet_save", wallet_save},
@@ -25,6 +25,15 @@ int main(void)
 	return (EXIT_SUCCESS);
 }
 
+/**
+ * cli_loop - Main loop of the cli
+ *
+ * Description:
+ *		.Initialize blockchain context structure
+ *		.Parse the each lines into command context structure
+ *		.Execute commands if line not empty
+ *		.Destroy blockchain context structure at the end
+*/
 void cli_loop(void)
 {
 	char *line;
@@ -50,13 +59,21 @@ void cli_loop(void)
 	} while (status >= 0);
 
 	blockchain_context_destroy(bchain_ctx);
-	if (status == -1)
-		exit(EXIT_FAILURE);
 }
 
 #define TOK_BUFSIZE 4
 #define TOK_DELIM "  \t\r\n\a"
-
+/**
+ * cli_split_line - Split the line into tokens array
+ * @line: line to split
+ * @tokens: adress of dynamic array of tokens
+ *
+ * Description:
+ *		.Split line using strtok
+ *		.Fill tokens with each tokens
+ *
+ * Return: The number of arguments argc
+*/
 int cli_split_line(char *line, char ***tokens)
 {
 	int bufsize = TOK_BUFSIZE, argc = 0;
@@ -80,7 +97,20 @@ int cli_split_line(char *line, char ***tokens)
 	return (argc);
 }
 
-int cli_execute_command(command_context_t *cmd_ctx, blockchain_context_t *bchain_ctx)
+/**
+ * cli_execute_command - Execute the command
+ *
+ * @cmd_ctx: command context structure containing the arguments
+ * @bchain_ctx: blockchain context structure containing the blockchain,
+ *			   the wallet, and the transaction pool
+ * Description:
+ *		.Loop over list of commands to check if the command passed
+ *		 as argument is matching with an implemented command
+ *
+ * Return: The status of the command, being 1 if success, or 0 otherwise
+*/
+int cli_execute_command(command_context_t *cmd_ctx,
+						blockchain_context_t *bchain_ctx)
 {
 	int i;
 	int status = 1;

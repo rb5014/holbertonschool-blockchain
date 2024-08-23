@@ -1,5 +1,6 @@
 #ifndef CLI_H
 #define CLI_H
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -12,6 +13,13 @@
 #define DEFAULT_WALLET_PATH "./wallet"
 #define LAST_WALLET_PATH_FILE "./last_wallet_path.txt"
 
+/**
+ * struct blockchain_context_s - Contains pointer to current blockchain,
+ *								 current wallet, and current transaction pool
+ * @blockchain: pointer to current blockchain in use
+ * @wallet: pointer to current wallet in use
+ * @transaction_pool: local list of the current pending transactions
+*/
 typedef struct blockchain_context_s
 {
 	blockchain_t *blockchain;
@@ -19,6 +27,12 @@ typedef struct blockchain_context_s
 	llist_t *transaction_pool;
 } blockchain_context_t;
 
+/**
+ * struct command_context_s - Contains name and arguments of the command input
+ * @name: name of the command (first argument of the line)
+ * @args: arguments of the command (following arguments)
+ * @argc: total number of arguments (including command name)
+*/
 typedef struct command_context_s
 {
 	char *name;
@@ -26,6 +40,11 @@ typedef struct command_context_s
 	int argc;
 } command_context_t;
 
+/**
+ * struct command_s - Contains name and associated function pointer
+ * @name: name of the command
+ * @func_ptr: aasociated function pointer
+*/
 typedef struct command_s
 {
 	char *name;
@@ -48,7 +67,7 @@ void blockchain_context_destroy(blockchain_context_t *bchain_ctx);
 int wallet_load(command_context_t *cmd_ctx, blockchain_context_t *bchain_ctx);
 int wallet_save(command_context_t *cmd_ctx, blockchain_context_t *bchain_ctx);
 
-/* blockchain_commands.c */
+/* blockchain commands */
 int send(command_context_t *cmd_ctx, blockchain_context_t *bchain_ctx);
 int mine(command_context_t *cmd_ctx, blockchain_context_t *bchain_ctx);
 int info(command_context_t *cmd_ctx, blockchain_context_t *bchain_ctx);

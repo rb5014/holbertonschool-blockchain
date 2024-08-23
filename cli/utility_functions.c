@@ -1,5 +1,11 @@
 #include "cli.h"
 
+/**
+ * is_positive_number - Check if string is a positive number
+ * @string: string to check
+ *
+ * Return: 1 if success, otherwise 0
+*/
 int is_positive_number(const char *string)
 {
 	size_t i;
@@ -12,6 +18,13 @@ int is_positive_number(const char *string)
 	return (1);
 }
 
+/**
+ * hex_str_to_pub - Converts an ASCII-encoded hexadecimal string
+ *					into an octet string
+ * @hex_string: The string to convert
+ *
+ * Return: Pointer to the converted string
+*/
 uint8_t *hex_str_to_pub(char *hex_string)
 {
 	uint8_t *octet_string;
